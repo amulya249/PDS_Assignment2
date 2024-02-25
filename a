@@ -1,4 +1,4 @@
-import pandas as pd
+a)import pandas as pd
 from sklearn.impute import SimpleImputer
 df = pd.read_csv('train.csv')
 print(df.isnull().sum())
@@ -12,3 +12,80 @@ for column in df.columns:
             df[column].fillna(mean_value, inplace=True)
 
 
+Justification for Action
+Imputation: Chosen to maximize the use of available data, especially if the missingness is low or can be systematically accounted for.
+It's crucial when the dataset is small, or the missing data holds significant predictive power or information.
+
+Dropping: Selected when the missing data is too extensive to be reliably imputed without introducing bias, or when the column with
+missing values is not critical for the analysis. Dropping rows is a last resort, typically reserved for when the missingness pattern
+indicates that imputation would lead to misleading conclusions.
+
+
+b)
+# First, ensure the columns you want to manipulate are of type string
+
+df['Mileage'] = df['Mileage'].astype(str)
+df['Engine'] = df['Engine'].astype(str)
+df['Power'] = df['Power'].astype(str)
+
+# Now, you can safely apply your remove_unit_and_convert function
+# Ensure this function handles the conversion properly, including using .str accessor
+# For demonstration, here's a simplified version of what the function might look like:
+
+def remove_unit_and_convert(column_name, unit):
+    # This will remove the unit from each entry and convert to float
+    # It assumes the unit is at the end of each string
+    return df[column_name].str.replace(unit, '').astype(float)
+
+# Applying the function (assuming it's correctly implemented above)
+df['Mileage'] = remove_unit_and_convert('Mileage', ' kmpl')
+df['Engine'] = remove_unit_and_convert('Engine', ' CC')
+df['Power'] = remove_unit_and_convert('Power', ' bhp')
+
+print(df)
+
+c)
+# Convert categorical variables into one-hot encoded columns
+# 'pd.get_dummies' automatically handles the conversion of categorical columns into one-hot encoded format
+df1 = pd.get_dummies(df, columns=['Fuel_Type', 'Transmission'])
+
+# Display the new DataFrame with one-hot encoded columns
+print("\nDataFrame after One-Hot Encoding:")
+print(df1)
+
+
+d)
+
+# Assuming the current year is 2024
+current_year = 2024
+
+# Calculate the age of the car and create a new column
+df['Car_Age'] = current_year - df['Year']
+
+print(df)
+
+
+e)
+select
+selectquery_df = df[['Name', 'Year', 'Price']]
+print(selectquery_df)
+
+filter
+filterquery_df = df[(df['Year'] > 2016) & (df['Fuel_Type'] == 'Diesel')]
+print(filterquery_df)
+
+rename
+df = df.rename(columns={'Kilometers_Driven': 'KMs_Driven'})
+print(df)
+
+mutate
+df['CarAge'] = 2020 - df['Year']
+print(df)
+
+arrange
+arrangequery = df.sort_values(by='Price', ascending=False)
+print(arrangequery)
+
+Summaeize
+summaryquery = df.groupby('Fuel_Type').agg(Average_Price=('Price', 'mean'), Average_Age=('Car_Age', 'mean')).reset_index()
+print(summaryquery)
